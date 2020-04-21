@@ -1,26 +1,52 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import axios from 'axios';
+import Movie from './Movie';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends React.Component {
+	state = {
+		isLoading: true,
+		movies: [],
+	};
+	// async componentDidMount() {
+	//   const moives = await axios.get('https://yts-proxy.now.sh/list_movies.json')
+	// }
+
+	getMovies = async () => {
+		const moives = await axios.get('https://yts-proxy.now.sh/list_movies.json');
+		const {
+			data: {
+				data: { movies },
+			},
+		} = moives;
+		this.setState({ isLoading: false, movies });
+
+		console.log(movies);
+	};
+
+	componentDidMount() {
+		this.getMovies();
+	}
+
+	render() {
+		const { isLoading, movies } = this.state;
+		return (
+			<div>
+				{isLoading
+					? 'loading'
+					: movies.map((movie) => (
+							<Movie
+								key={movie.id}
+								title={movie.title}
+								id={movie.id}
+								year={movie.year}
+								summary={movie.summary}
+								poster={movie.medium_cover_image}
+								genres={movie.genres}
+							/>
+					  ))}
+			</div>
+		);
+	}
 }
 
 export default App;
